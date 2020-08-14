@@ -93,6 +93,21 @@ const createList = function(name) {
 	newList.removeAttribute("style");
 	newList.className = "list";
 
+	// Set up events for editing the list's name
+	const listName = newList.children[0].children[0];
+	listName.addEventListener('click', editList);
+	const editText = newList.children[0].children[1].children[0];
+
+	editText.addEventListener("keyup", (event) => {
+		if(event.key == "Enter" || event.key == "Escape") {
+			saveListEdit(event.target);
+		}
+	});
+	editText.addEventListener("blur", (event) => {
+		saveListEdit(event.target);
+	});
+
+
 	// "Add Task" Button
 	const addTaskButton = newList.children[2].children[0];
 	addTaskButton.addEventListener('click', addTask);
@@ -100,6 +115,34 @@ const createList = function(name) {
 	console.log(newList.children);
 	return newList;
 }
+
+function editList(event) {
+	const text = event.target.innerText;
+	console.log(text);
+
+	const textDiv = event.target;
+	const editDiv = event.target.parentElement.children[1];
+	const editList = event.target.parentElement.children[1].children[0];
+	console.log(editList);
+	editList.value = textDiv.innerText;
+	textDiv.style.display = 'none';
+	editDiv.style.display = 'inline';
+	editList.focus();
+	editList.select();
+}
+
+const saveListEdit = function(element) {
+	const editText = element;
+	const editDiv = element.parentElement;
+	const textDiv = element.parentElement.parentElement.children[0];
+
+	if(editText.value == "") editText.value = "[Enter title]"
+	textDiv.innerText = editText.value;
+	textDiv.style.display = 'inline';
+	editDiv.style.display = 'none';
+	console.log("text div:", textDiv);
+}
+
 
 const addTask = function(event) {
 	console.log("Add Task button pressed");
@@ -114,6 +157,8 @@ const addList = function(event) {
 	const newList = createList("New List");
 	boardBody.appendChild(newList);
 	setupSortables();
+	const listName = newList.children[0].children[0];
+	listName.dispatchEvent(new Event("click"));
 }
 
 const createTask = function(name = "New Task", start = false, startDate = "", due = false, dueDate = "") {

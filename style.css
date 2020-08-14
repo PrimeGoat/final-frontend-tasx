@@ -71,6 +71,16 @@
 	outline: none;
 }
 
+.listEdit {
+	display: none;
+}
+
+.listEditInput {
+	background-color: beige;
+	border: none;
+	outline: none;
+}
+
 .dateSpan {
 	display: inline-block;
 	width: 75px;
