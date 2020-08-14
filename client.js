@@ -5,7 +5,7 @@ const sampleTask = {
 	taskId: 12345,
 	title: "Sample Task",
 	startDate: "",
-	dueDate: "08-12-2020"
+	dueDate: "2020-08-12"
 }
 
 // List
@@ -32,36 +32,41 @@ console.log(kanbanBoard);
 // PUT /updatetask/:id
 // DELETE /killtask/:id
 
+const setupSortables = function() {
+	$( () => {
+		$( ".listBody" ).sortable({
+			connectWith: ".connectedSorts",
+			stop: () => {
+				const structure = getBoardStructure();
+				console.log("Task item has been moved.");
+			}
+		}).disableSelection();
+	} );
 
-$( () => {
-	$( ".listBody" ).sortable({
-		connectWith: ".connectedSorts",
-		stop: () => {
-			const structure = getBoardStructure();
-			console.log("Task item has been moved.");
-		}
-	}).disableSelection();
-} );
-
-$( () => {
-	$( ".boardBody" ).sortable({
-		axis: 'x',
-		change: () => {
-			const structure = getBoardStructure();
-			console.log("List has been moved.");
-		}
-	}).disableSelection();
-} );
+	$( () => {
+		$( ".boardBody" ).sortable({
+			axis: 'x',
+			change: () => {
+				const structure = getBoardStructure();
+				console.log("List has been moved.");
+			}
+		}).disableSelection();
+	} );
+}
 
 const populateBoard = function() {
 	const boardBody = document.getElementById("insertLists");
 
 	const newList = createList("Sample List");
 	boardBody.appendChild(newList);
+	const newList2 = createList("Sample List");
+	boardBody.appendChild(newList2);
 
 	// Create task in list
 	const newTask = createTask("Sample task", true, "2020-04-20");
 	newList.children[1].appendChild(newTask);
+
+	setupSortables();
 }
 
 const getBoardStructure = function() {
@@ -96,9 +101,22 @@ const createList = function(name) {
 	return newList;
 }
 
+const addTask = function(event) {
+	console.log("Add Task button pressed");
+	const list = event.target.parentElement.parentElement.children[1];
+	list.appendChild(createTask());
+}
 
+const addList = function(event) {
+	console.log("Add List button pressed");
+	const boardBody = document.getElementById("insertLists");
 
-const createTask = function(name, start = false, startDate = "", due = false, dueDate = "") {
+	const newList = createList("New List");
+	boardBody.appendChild(newList);
+	setupSortables();
+}
+
+const createTask = function(name = "New Task", start = false, startDate = "", due = false, dueDate = "") {
 	const taskTemplate = document.getElementById("taskTemplate");
 	const newTask = taskTemplate.cloneNode(true);
 	newTask.removeAttribute("id");
@@ -154,6 +172,7 @@ function editTask(event) {
 	textDiv.style.display = 'none';
 	editDiv.style.display = 'inline';
 	editText.focus();
+	editText.select();
 }
 
 const saveTaskEdit = function(element) {
@@ -168,5 +187,5 @@ const saveTaskEdit = function(element) {
 	console.log("text div:", textDiv);
 }
 
-
+document.getElementById("addListButton").addEventListener("click", addList);
 populateBoard();
