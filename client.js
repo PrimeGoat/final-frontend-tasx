@@ -1,3 +1,38 @@
+// API
+
+// Task
+const sampleTask = {
+	taskId: 12345,
+	title: "Sample Task",
+	startDate: "",
+	dueDate: "08-12-2020"
+}
+
+// List
+const sampleList = {
+	ListId: 456,
+	title: "Todo",
+	tasks: [sampleTask]
+}
+
+// Board
+const kanbanBoard = {
+	title: "Task Manager",
+	lists: [sampleList]
+}
+
+console.log(kanbanBoard);
+
+// Routes:
+
+// GET /board
+// GET /list/:id
+// GET /task/:id
+// POST
+// PUT /updatetask/:id
+// DELETE /killtask/:id
+
+
 $( () => {
 	$( ".listBody" ).sortable({
 		connectWith: ".connectedSorts",
@@ -18,6 +53,16 @@ $( () => {
 	}).disableSelection();
 } );
 
+const populateBoard = function() {
+	const boardBody = document.getElementById("insertLists");
+
+	const newList = createList("Sample List");
+	boardBody.appendChild(newList);
+
+	// Create task in list
+	const newTask = createTask("Sample task", true, "2020-04-20");
+	newList.children[1].appendChild(newTask);
+}
 
 const getBoardStructure = function() {
 	const lists = document.querySelector('.boardBody').children;
@@ -34,88 +79,68 @@ const getBoardStructure = function() {
 	}
 }
 
-const addTask = function(event) {
-	console.log("Button pressed.");
-	const listId = event.target.parentElement.parentElement.getAttribute('data-listId');
-	const newTask = document.createElement('div');
-	newTask.className = "task";
-	newTask.setAttribute("data-taskId", taskId++);
-	newTask.innerText = "Task";
-	event.target.parentElement.parentElement.children[1].appendChild(newTask);
+const createList = function(name) {
+	const listTemplate = document.getElementById("listTemplate");
 
-	console.log(listId);
+	// Create list
+	const newList = listTemplate.cloneNode(true);
+	newList.removeAttribute("id");
+	newList.removeAttribute("style");
+	newList.className = "list";
+
+	// "Add Task" Button
+	const addTaskButton = newList.children[2].children[0];
+	addTaskButton.addEventListener('click', addTask);
+
+	console.log(newList.children);
+	return newList;
 }
 
-/*
-<!-- START TASK -->
-<div class="task" data-taskId="0">
-	<div class="taskTitle">
-		Task
-	</div>
-	<div class="taskEdit">
-		<input type="text" class="taskEditInput">
-	</div>
-	<div class="dates">
-		<input type="checkbox" class="startCheck">
-		<span style="display: inline-block; width: 75px;">
-			<label>Start date:</label>
-		</span>
-		<input type="date" class="startDate">
-		<br>
-		<input type="checkbox" class="dueCheck">
-		<span style="display: inline-block; width: 75px;">
-			<label>Due date:</label>
-		</span>
-		<input type="date" class="dueDate">
-	</div>
-</div>
-<!-- END TASK -->
-*/
+
+
+const createTask = function(name, start = false, startDate = "", due = false, dueDate = "") {
+	const taskTemplate = document.getElementById("taskTemplate");
+	const newTask = taskTemplate.cloneNode(true);
+	newTask.removeAttribute("id");
+	newTask.removeAttribute("style");
+	newTask.className = "task";
+	newTask.setAttribute("data-taskId", taskId++);
+
+	// Populate task
+	const taskName = newTask.children[0];
+	taskName.innerText = name;
+
+	const nodeStartCheck = newTask.children[2].children[0];
+	nodeStartCheck.checked = start;
+
+	const nodeStartDate = newTask.children[2].children[2];
+	nodeStartDate.value = startDate;
+
+	const nodeDueCheck = newTask.children[2].children[4];
+	nodeDueCheck.checked = due;
+
+	const nodeDueDate = newTask.children[2].children[6];
+	nodeDueDate.value = dueDate;
+
+	// Set up events for editing the task's name
+	taskName.addEventListener('click', editTask);
+	const editText = newTask.children[1].children[0];
+
+	editText.addEventListener("keyup", (event) => {
+		if(event.key == "Enter" || event.key == "Escape") {
+			saveTaskEdit(event.target);
+		}
+	});
+	editText.addEventListener("blur", (event) => {
+		saveTaskEdit(event.target);
+	});
+
+	//console.log(newTask.children);
+	return newTask;
+}
 
 var listId = 0;
 var taskId = 0;
-
-// Creates a task and returns the element
-const createTask = function() {
-	const task			= document.createElement('div');
-	task.className 		= "task";
-	task.setAttribute("data-taskId", taskId++);
-
-	const taskTitle		= document.createElement('div');
-	taskTitle.className = "taskTitle";
-	taskTitle.innerText = "[Enter title]";
-
-	const taskEdit 		= document.createElement('div');
-	taskEdit.className 	= "taskEdit";
-
-	const taskEditInput = document.createElement('input');
-
-	const dates 		= document.createElement('div');
-
-
-
-	const startCheck 	= document.createElement('input');
-
-	const startSpan 	= document.createElement('span');
-
-	const startLabel 	= document.createElement('label');
-
-	const startDate 	= document.createElement('input');
-
-
-
-	const newline 		= document.createElement('br');
-
-
-
-	const dueCheck 		= document.createElement('input');
-
-	const dueSpan 		= document.createElement('span');
-
-	const dueLabel 		= document.createElement('label');
-
-	const dueDate 		= document.createElement('input');
-}
 
 function editTask(event) {
 	const text = event.target.innerText;
@@ -129,43 +154,19 @@ function editTask(event) {
 	textDiv.style.display = 'none';
 	editDiv.style.display = 'inline';
 	editText.focus();
-
-	editText.addEventListener("keyup", (event) => {
-		if(event.key == "Enter") {
-			console.log("Enter detected.");
-			const editText = event.target;
-			const editDiv = event.target.parentElement;
-			const textDiv = event.target.parentElement.parentElement.children[0];
-
-			if(editText.value == "") editText.value = "[Enter title]"
-			textDiv.innerText = editText.value;
-			textDiv.style.display = 'inline';
-			editDiv.style.display = 'none';
-			console.log("text div:", textDiv);
-		}
-	})
-
-
-/*	var theText = document.getElementById('thetext');
-	var theEditor = document.getElementById('ta1');
-	var editorArea = document.getElementById('editor');
-
-	//set text in text div to textarea
-	//correct line breaks, prevent HTML injection
-	var subject = theText.innerHTML;
-	subject = subject.replace(new RegExp("<br />", "gi"), 'n');
-	subject = subject.replace(new RegExp("<br />", "gi"), 'n');
-	subject = subject.replace(new RegExp("<", "gi"), '<');
-	subject = subject.replace(new RegExp(">", "gi"), '>');
-	theEditor.value = subject;
-
-	//hide text, show editor
-	theText.style.display = 'none';
-	editorArea.style.display = 'inline';
-	*/
 }
 
-document.querySelector('.addButton').addEventListener('click', addTask);
-document.querySelector('.taskTitle').addEventListener('click', editTask);
+const saveTaskEdit = function(element) {
+	const editText = element;
+	const editDiv = element.parentElement;
+	const textDiv = element.parentElement.parentElement.children[0];
 
-//document.querySelector('.startDate').valueAsDate = new Date();
+	if(editText.value == "") editText.value = "[Enter title]"
+	textDiv.innerText = editText.value;
+	textDiv.style.display = 'inline';
+	editDiv.style.display = 'none';
+	console.log("text div:", textDiv);
+}
+
+
+populateBoard();

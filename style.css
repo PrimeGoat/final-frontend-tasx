@@ -36,6 +36,7 @@
 }
 
 .listBody {
+	min-height: 25px;
 	box-sizing: border-box;
 }
 
@@ -54,7 +55,7 @@
 }
 
 .taskEdit {
-	/*display: none;*/
+	display: none;
 }
 
 .taskEditInput {

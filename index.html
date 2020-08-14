@@ -6,75 +6,52 @@
 	<title>Document</title>
 	<link rel="stylesheet" href="style.css">
 </head>
+
+<!-- START LIST TEMPLATE -->
+<div class="!list" data-listId="a" style="display: none;" id="listTemplate">
+	<div class="listHeader">
+		List Title
+	</div>
+	<div class="listBody connectedSorts">
+
+	</div>
+	<div class="listFooter">
+		<button class="addButton">Add Another Task</button>
+	</div>
+</div>
+<!-- END LIST TEMPLATE -->
+
+<!-- TASK TEMPLATE -->
+<div class="!task" data-taskId="0" style="display: none;" id="taskTemplate">
+	<div class="taskTitle">
+		Task
+	</div>
+	<div class="taskEdit">
+		<input type="text" class="taskEditInput">
+	</div>
+	<div class="dates">
+		<input type="checkbox" class="startCheck">
+		<span style="display: inline-block; width: 75px;">
+			<label>Start date:</label>
+		</span>
+		<input type="date" class="startDate">
+		<br>
+		<input type="checkbox" class="dueCheck">
+		<span style="display: inline-block; width: 75px;">
+			<label>Due date:</label>
+		</span>
+		<input type="date" class="dueDate">
+	</div>
+</div>
+<!-- END TASK TEMPLATE -->
+
 <body>
 	<div class="main">
 		<div class="board">
 			<div class="boardHeader">
 				BOARD HEADER
 			</div>
-			<div class="boardBody">
-				<div class="list" data-listId="a">
-					<div class="listHeader">
-						List Title
-					</div>
-					<div class="listBody connectedSorts" id="sortList1">
-
-						<!-- START TASK -->
-						<div class="task" data-taskId="0">
-							<div class="taskTitle">
-								Task
-							</div>
-							<div class="taskEdit">
-								<input type="text" class="taskEditInput">
-							</div>
-							<div class="dates">
-								<input type="checkbox" class="startCheck">
-								<span style="display: inline-block; width: 75px;">
-									<label>Start date:</label>
-								</span>
-								<input type="date" class="startDate">
-								<br>
-								<input type="checkbox" class="dueCheck">
-								<span style="display: inline-block; width: 75px;">
-									<label>Due date:</label>
-								</span>
-								<input type="date" class="dueDate">
-							</div>
-						</div>
-						<!-- END TASK -->
-
-
-						<div class="task" data-taskId="1">
-							Task
-						</div>
-						<div class="task" data-taskId="2">
-							Task
-						</div>
-					</div>
-					<div class="listFooter">
-						<button class="addButton">Add Another Task</button>
-					</div>
-				</div>
-
-				<div class="list" data-listId="b">
-					<div class="listHeader">
-						List Title
-					</div>
-					<div class="listBody connectedSorts" id="sortList1">
-						<div class="task" data-taskId="3">
-							Task
-						</div>
-						<div class="task" data-taskId="4">
-							Task
-						</div>
-						<div class="task" data-taskId="5">
-							Task
-						</div>
-					</div>
-					<div class="listFooter">
-						<button class="addButton">Add Another Task</button>
-					</div>
-				</div>
+			<div class="boardBody" id="insertLists">
 			</div>
 		</div>
 	</div>
