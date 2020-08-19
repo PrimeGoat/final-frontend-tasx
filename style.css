@@ -99,6 +99,10 @@
 	flex-direction: row;
 }
 
+.dateGreyed {
+	background-color: lightgray;
+}
+
 .addButton {
 	width: 100%;
 }
