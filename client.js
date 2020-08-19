@@ -17,7 +17,7 @@ const sampleList = {
 
 // Board
 const kanbanBoard = {
-	title: "Task Manager",
+	title: "TASX",
 	lists: [
 		sampleList,
 		{
@@ -40,7 +40,6 @@ const kanbanBoard = {
 		}
 	]
 }
-
 console.log(kanbanBoard);
 
 // Routes:
@@ -48,8 +47,10 @@ console.log(kanbanBoard);
 /*\
 
 GET /board - Gets entire structure
-PUT /structure - Sends rearranged structure.  This is sent whenever anything is moved around
+PUT /structure - Sends a bare (only IDs) structure.  This is sent whenever anything is moved around
 PUT /task/:id - Edits a task
+PUT /renameboard - Renames the board
+PUT /renamelist/:listid - Renams a list
 PUSH /newlist - Adds new list to end of lists
 PUSH /newtask/:listid - Adds new task to end of a list
 DELETE /deltask/:taskid - Deletes a task
@@ -60,12 +61,6 @@ DELETE /dellist/:listid - Deletes a list and all of its tasks
 
 \*/
 
-// GET /board
-// GET /list/:id
-// GET /task/:id
-// POST
-// PUT /updatetask/:id
-// DELETE /killtask/:id
 
 const setupSortables = function() {
 	$( () => {
@@ -118,6 +113,9 @@ const kanbanBoard = {
 */
 
 const populateBoard = function() {
+	const boardTitle = document.getElementById("boardTitle");
+	boardTitle.innerText = kanbanBoard.title;
+
 	for(list of kanbanBoard.lists) {
 		placeList(list.title, list.listid);
 
@@ -125,19 +123,47 @@ const populateBoard = function() {
 			placeTask(list.listid, task.title, task.taskid, task.startDate != "", task.startDate, task.dueDate != "", task.dueDate);
 		}
 	}
-
-	// const boardBody = document.querySelector("#insertLists");
-
-	// const newList = createList("Sample List");
-	// boardBody.appendChild(newList);
-	// const newList2 = createList("Sample List");
-	// boardBody.appendChild(newList2);
-
-	// // Create task in list
-	// const newTask = createTask("Sample task", true, "2020-04-20");
-	// newList.children[1].appendChild(newTask);
-
 	setupSortables();
+}
+
+const boardNaming = function() {
+	const boardTitle = document.getElementById("boardTitle");
+	const boardTitleEdit = document.getElementById("boardEdit");
+
+	boardTitle.addEventListener('click', editBoard);
+
+	boardTitleEdit.addEventListener('keyup', (event) => {
+		if(event.key == 'Enter' || event.key == 'Escape') {
+			saveBoardEdit(event.target);
+		}
+	});
+	boardTitleEdit.addEventListener('blur', (event) => {
+		saveBoardEdit(event.target);
+	});
+}
+
+const editBoard = function(event) {
+	const text = event.target.innerText;
+	console.log("Board text: ", text);
+
+	const label = event.target;
+	const edit = event.target.parentElement.children[1];
+	edit.value = label.innerText;
+	label.style.display = 'none';
+	edit.style.display = 'inline';
+	edit.focus();
+	edit.select();
+}
+
+const saveBoardEdit = function(element) {
+	const edit = element;
+	const label = element.parentElement.children[0];
+
+	if(edit.value.trim() == "") edit.value = "[Enter title]";
+	label.innerText = edit.value;
+	label.style.display = 'inline';
+	edit.style.display = 'none';
+	//TODO: Tell API that the board has been renamed
 }
 
 const placeList = function(name = "New List", id = "") {
@@ -183,9 +209,10 @@ const getBoardStructure = function() {
 		structure.push(entry);
 	}
 
-	console.log(structure);
+	console.log("STRUCTURE: " + JSON.stringify(structure));
 	return structure;
 }
+
 
 const createList = function(name = "New List", id = "") {
 	const listTemplate = document.getElementById("listTemplate");
@@ -195,7 +222,8 @@ const createList = function(name = "New List", id = "") {
 	newList.removeAttribute("id");
 	newList.removeAttribute("style");
 	newList.className = "list";
-	newList.setAttribute("data-listid", (id == "") ? listid++ : id);
+	id = (id == "") ? listid++ : id;
+	newList.setAttribute("data-listid", id);
 
 	// Set up events for editing the list's name
 	const listName = newList.children[0].children[0];
@@ -218,18 +246,32 @@ const createList = function(name = "New List", id = "") {
 	const addTaskButton = newList.children[2].children[0];
 	addTaskButton.addEventListener('click', addTask);
 
-	console.log(newList.children);
+	const deleteListButton = newList.children[2].children[1];
+	deleteListButton.addEventListener("click", () => {
+		deleteList(newList, id);
+	})
+
+	//TODO: Tell API that new list has been created
+
 	return newList;
 }
 
-function editList(event) {
+const deleteList = function(element, id) {
+	if(!confirm("Are you sure you want to delete this list?")) return;
+
+	element.remove();
+
+	//TODO: Tell API that list was removed
+	console.log("List ID " + id + " has been removed.");
+}
+
+const editList = function(event) {
 	const text = event.target.innerText;
 	console.log(text);
 
 	const textDiv = event.target;
 	const editDiv = event.target.parentElement.children[1];
 	const editList = event.target.parentElement.children[1].children[0];
-	console.log(editList);
 	editList.value = textDiv.innerText;
 	textDiv.style.display = 'none';
 	editDiv.style.display = 'inline';
@@ -242,18 +284,22 @@ const saveListEdit = function(element) {
 	const editDiv = element.parentElement;
 	const textDiv = element.parentElement.parentElement.children[0];
 
-	if(editText.value == "") editText.value = "[Enter title]"
+	if(editText.value.trim() == "") editText.value = "[Enter title]";
 	textDiv.innerText = editText.value;
 	textDiv.style.display = 'inline';
 	editDiv.style.display = 'none';
-	console.log("text div:", textDiv);
+
+	//TODO: Tell API that list has been renamed
 }
 
 
 const addTask = function(event) {
 	console.log("Add Task button pressed");
 	const list = event.target.parentElement.parentElement.children[1];
-	list.appendChild(createTask());
+	const newTask = createTask()
+	list.appendChild(newTask);
+	const taskName = newTask.children[0];
+	taskName.dispatchEvent(new Event("click"));
 }
 
 const addList = function(event) {
@@ -273,7 +319,8 @@ const createTask = function(name = "New Task", start = false, startDate = "", du
 	newTask.removeAttribute("id");
 	newTask.removeAttribute("style");
 	newTask.className = "task";
-	newTask.setAttribute("data-taskid", (id == "") ? taskid++ : id);
+	id = (id == "") ? taskid++ : id;
+	newTask.setAttribute("data-taskid", id);
 
 	// console.log("NEW TASK DATE STUFF")
 	// console.log(newTask.children[2].children[0].children[0]);
@@ -290,20 +337,18 @@ const createTask = function(name = "New Task", start = false, startDate = "", du
 
 	const nodeStartDate = newTask.children[2].children[0].children[2];
 	nodeStartDate.value = startDate;
-	nodeStartCheck.addEventListener("change", () => {
-		checkCheck(nodeStartCheck, nodeStartDate);
-	});
-	checkCheck(nodeStartCheck, nodeStartDate);
+	nodeStartDate.addEventListener("change", () => updateTask(newTask));
+	nodeStartCheck.addEventListener("change", () => checkCheck(nodeStartCheck, nodeStartDate));
+	checkCheck(nodeStartCheck, nodeStartDate, true);
 
 	const nodeDueCheck = newTask.children[2].children[1].children[0];
 	nodeDueCheck.checked = due;
 
 	const nodeDueDate = newTask.children[2].children[1].children[2];
 	nodeDueDate.value = dueDate;
-	nodeDueCheck.addEventListener("change", () => {
-		checkCheck(nodeDueCheck, nodeDueDate);
-	});
-	checkCheck(nodeDueCheck, nodeDueDate);
+	nodeDueDate.addEventListener("change", () => updateTask(newTask));
+	nodeDueCheck.addEventListener("change", () => checkCheck(nodeDueCheck, nodeDueDate));
+	checkCheck(nodeDueCheck, nodeDueDate, true);
 
 	// Set up events for editing the task's name
 	taskName.addEventListener('click', editTask);
@@ -318,23 +363,46 @@ const createTask = function(name = "New Task", start = false, startDate = "", du
 		saveTaskEdit(event.target);
 	});
 
-	//console.log(newTask.children);
+	const deleteButton = newTask.children[2].children[2];
+	deleteButton.addEventListener("click", () => {
+		deleteTask(newTask, id);
+	});
+
+	//TODO: Tell API that new task has been created
+
 	return newTask;
 }
 
-const checkCheck = function(check, date) {
+const deleteTask = function(element, id) {
+	element.remove();
+
+	//TODO: Tell API that task was removed
+	console.log("Task ID " + id + " has been removed.");
+}
+
+const checkCheck = function(check, date, initial = false) {
 	if(check.checked) unGreyDate(date);
 	else greyOutDate(date);
+
+	if(!initial) {
+		//TODO: Tell API about change
+	}
+}
+
+const updateTask = function(element) {
+	//TODO: Tell API that task has been updated
 }
 
 const greyOutDate = function(element) {
 	element.classList.add("dateGreyed");
 	element.setAttribute("readonly", "");
+	element.setAttribute("disabled", "");
 }
 
 const unGreyDate = function(element) {
 	element.classList.remove("dateGreyed");
 	element.removeAttribute("readonly");
+	element.removeAttribute("disabled");
 }
 
 var listid = 0;
@@ -360,12 +428,14 @@ const saveTaskEdit = function(element) {
 	const editDiv = element.parentElement;
 	const textDiv = element.parentElement.parentElement.children[0];
 
-	if(editText.value == "") editText.value = "[Enter title]"
+	if(editText.value.trim() == "") editText.value = "[Enter title]"
 	textDiv.innerText = editText.value;
 	textDiv.style.display = 'inline';
 	editDiv.style.display = 'none';
-	console.log("text div:", textDiv);
+
+	//TODO: Tell API that task has been edited
 }
 
 document.getElementById("addListButton").addEventListener("click", addList);
 populateBoard();
+boardNaming();

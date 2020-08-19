@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Document</title>
+	<title>TASX</title>
 	<link rel="stylesheet" href="style.css">
 </head>
 
@@ -22,6 +22,7 @@
 	</div>
 	<div class="listFooter">
 		<button class="addButton">Add Another Task</button>
+		<button>X</button>
 	</div>
 </div>
 <!-- END LIST TEMPLATE -->
@@ -37,18 +38,19 @@
 	<div class="dates">
 		<div class="dateRow">
 			<input type="checkbox" class="startCheck">
-			<span style="display: inline-block; width: 75px;">
+			<span class="dateSpan">
 				<label>Start date:</label>
 			</span>
-			<input type="date" class="startDate">
+			<input type="date" class="startDate dateInput">
 		</div>
 		<div class="dateRow">
 			<input type="checkbox" class="dueCheck">
-			<span style="display: inline-block; width: 75px;">
+			<span class="dateSpan">
 				<label>Due date:</label>
 			</span>
-			<input type="date" class="dueDate">
+			<input type="date" class="dueDate dateInput">
 		</div>
+		<button class="deleteTask">DELETE</button>
 	</div>
 </div>
 <!-- END TASK TEMPLATE -->
@@ -57,7 +59,8 @@
 	<div class="main">
 		<div class="board">
 			<div class="boardHeader">
-				<span>BOARD HEADER</span>
+				<span id="boardTitle">BOARD HEADER</span>
+				<input type="text" id="boardEdit" value="BOARD HEADER"></input>
 				<button class="addList" id="addListButton">Add Another List</button>
 			</div>
 			<div class="boardBody" id="insertLists">
