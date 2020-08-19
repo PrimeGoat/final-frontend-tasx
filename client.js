@@ -55,7 +55,7 @@ const setupSortables = function() {
 }
 
 const populateBoard = function() {
-	const boardBody = document.getElementById("insertLists");
+	const boardBody = $("insertLists");
 
 	const newList = createList("Sample List");
 	boardBody.appendChild(newList);
@@ -169,20 +169,25 @@ const createTask = function(name = "New Task", start = false, startDate = "", du
 	newTask.className = "task";
 	newTask.setAttribute("data-taskId", taskId++);
 
+	console.log("NEW TASK DATE STUFF")
+	console.log(newTask.children[2].children[0].children[0]);
+	console.log(newTask.children[2].children[0].children[2]);
+	console.log(newTask.children[2].children[1].children[0]);
+	console.log(newTask.children[2].children[1].children[2]);
 	// Populate task
 	const taskName = newTask.children[0];
 	taskName.innerText = name;
 
-	const nodeStartCheck = newTask.children[2].children[0];
+	const nodeStartCheck = newTask.children[2].children[0].children[0];
 	nodeStartCheck.checked = start;
 
-	const nodeStartDate = newTask.children[2].children[2];
+	const nodeStartDate = newTask.children[2].children[0].children[2];
 	nodeStartDate.value = startDate;
 
-	const nodeDueCheck = newTask.children[2].children[4];
+	const nodeDueCheck = newTask.children[2].children[1].children[0];
 	nodeDueCheck.checked = due;
 
-	const nodeDueDate = newTask.children[2].children[6];
+	const nodeDueDate = newTask.children[2].children[1].children[2];
 	nodeDueDate.value = dueDate;
 
 	// Set up events for editing the task's name

@@ -48,7 +48,7 @@
 }
 
 .task {
-	height: 200px;
+	min-height: 100px;
 	background-color: cyan;
 	box-sizing: border-box;
 	padding: 10px;
@@ -83,12 +83,20 @@
 
 .dateSpan {
 	display: inline-block;
-	width: 75px;
+	width: 50px;
 }
 
 .dates {
-	position: absolute;
+	display: flex;
+	flex-direction: column;
+	position: relative;
+	margin-top: 40px;
 	bottom: 5px;
+}
+
+.dateRow {
+	display: flex;
+	flex-direction: row;
 }
 
 .addButton {
