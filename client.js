@@ -1,5 +1,36 @@
 // API
 
+/*\
+
+GET /board - Gets entire structure
+PUT /structure - Sends a bare (only IDs) structure.  This is sent whenever anything is moved around
+PUT /task/:id - Edits a task
+PUT /renameboard - Renames the board
+PUT /renamelist/:listid - Renams a list
+PUSH /newlist - Adds new list to end of lists
+PUSH /newtask/:listid - Adds new task to end of a list
+DELETE /deltask/:taskid - Deletes a task
+DELETE /dellist/:listid - Deletes a list and all of its tasks
+
+\*/
+
+
+
+
+const getBoard = async function() {
+	const xhttp = new XMLHttpRequest();
+
+	xhttp.onreadystatechange = () => {
+		console.log(this.responseText);
+	};
+
+	xhttp.open("GET", 'http://localhost:3000/api/v1/board', true);
+	xhttp.send();
+}
+
+
+
+
 // Task
 const sampleTask = {
 	taskid: 12345,
@@ -40,26 +71,7 @@ const kanbanBoard = {
 		}
 	]
 }
-console.log(kanbanBoard);
-
-// Routes:
-
-/*\
-
-GET /board - Gets entire structure
-PUT /structure - Sends a bare (only IDs) structure.  This is sent whenever anything is moved around
-PUT /task/:id - Edits a task
-PUT /renameboard - Renames the board
-PUT /renamelist/:listid - Renams a list
-PUSH /newlist - Adds new list to end of lists
-PUSH /newtask/:listid - Adds new task to end of a list
-DELETE /deltask/:taskid - Deletes a task
-DELETE /dellist/:listid - Deletes a list and all of its tasks
-
-
-
-
-\*/
+//console.log(kanbanBoard);
 
 
 const setupSortables = function() {
